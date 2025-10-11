@@ -12,6 +12,11 @@ kernel_entry:
     ; Set up a stack
     mov $stack_top, %rsp
 
+    ; Multiboot2 specification states that EBX contains the address of the Multiboot information structure
+    ; and EAX contains the magic number. These are passed as arguments to kernel_main.
+    push %ebx
+    push %eax
+
     ; Call the C kernel_main function
     call kernel_main
 
