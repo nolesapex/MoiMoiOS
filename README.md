@@ -3,7 +3,6 @@
 <!-- MoiMoiOS README -->
 <h1 align="center">
   <img src="MoiMoiOS.png" alt="MoiMoiOS Logo" width="420"/><br>
-  <b>MoiMoiOS</b>
 </h1>
 
 <p align="center">
