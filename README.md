@@ -1,16 +1,17 @@
 # MoiMoiOS
 
-<h1 align="center">MoiMoiOS</h1>
+<!-- MoiMoiOS README -->
+<h1 align="center">
+  <img src="MoiMoiOS.png" alt="MoiMoiOS Logo" width="420"/><br>
+  <b>MoiMoiOS</b>
+</h1>
 
 <p align="center">
-<pre>
- __  __       _ _       _   ___   ____  
-|  \/  | ___ (_) |_ ___| | |__ \ / __ \ 
-| |\/| |/ _ \| | __/ _ \ |    ) | |  | |
-| |  | | (_) | | ||  __/ |   / /| |__| |
-|_|  |_|\___/|_|\__\___|_|  |____\____/ 
-</pre>
+  <i>Modular Capability-Based Operating System</i><br>
+  <b>Built from Scratch · Secure · Lightweight · Auditable</b>
 </p>
+
+---
 
 <p align="center">
 <b>Modular Capability-Based Operating System</b><br>
