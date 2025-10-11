@@ -10,6 +10,7 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
 # Add kernel source directories
 aux_source_directory(kernel/core CORE_SOURCES)
+list(APPEND CORE_SOURCES kernel/core/klog.c kernel/core/panic.c)
 aux_source_directory(kernel/services/chest CHEST_SOURCES)
 aux_source_directory(kernel/services/io IO_SOURCES)
 aux_source_directory(kernel/services/notification NOTIFICATION_SOURCES)
