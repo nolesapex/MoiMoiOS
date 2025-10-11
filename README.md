@@ -1,15 +1,22 @@
 # MoiMoiOS
 
-__  __       _ _       _   ___   ____  
+<h1 align="center">MoiMoiOS</h1>
+
+<p align="center">
+<pre>
+ __  __       _ _       _   ___   ____  
 |  \/  | ___ (_) |_ ___| | |__ \ / __ \ 
 | |\/| |/ _ \| | __/ _ \ |    ) | |  | |
 | |  | | (_) | | ||  __/ |   / /| |__| |
 |_|  |_|\___/|_|\__\___|_|  |____\____/ 
+</pre>
+</p>
 
-    Modular Capability-Based Operating System
-              Built from Scratch.
-
----
+<p align="center">
+<b>Modular Capability-Based Operating System</b><br>
+<i>Built from Scratch.</i>
+</
+    p>
 
 ## What is MoiMoiOS?
 
