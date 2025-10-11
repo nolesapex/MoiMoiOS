@@ -105,7 +105,7 @@ void trap_dispatch(uint64_t trapno, uint64_t err, uint64_t rip) {
 }
 
 // ----------------------------------------------------------
-// IDT Setup (Unchanged from your version)
+// IDT Setup
 // ----------------------------------------------------------
 void set_idt_entry(int vector, void* handler) {
     uint64_t addr = (uint64_t)handler;
