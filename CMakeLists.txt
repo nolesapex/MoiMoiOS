@@ -33,21 +33,23 @@ include_directories(
 )
 
 # Set common compiler flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -std=c11 -ffreestanding -O2 -g")
-set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -f elf64")
+target_compile_options(moimoios.bin PRIVATE
+    $<$<COMPILE_LANG_AND_ID:C,GNU>: -Wall -Wextra -std=c11 -ffreestanding -O2 -g>
+    $<$<COMPILE_LANG_AND_ID:ASM,GNU>: -f elf64>
+    # MSVC specific flags (placeholder, may need adjustment for bare-metal)
+    $<$<COMPILE_LANG_AND_ID:C,MSVC>: /W4 /WX /std:c11 /O2 /Zi>
+    $<$<COMPILE_LANG_AND_ID:ASM,MSVC>: > # MSVC assembly flags might need specific handling or separate assembler
+)
 
 # Create the kernel executable
 add_executable(moimoios.bin ${KERNEL_SOURCES})
 
-# Linker script
+# Linker script and options
 target_link_options(moimoios.bin PRIVATE
-    -T kernel/boot/linker.ld
-    -nostdlib
-)
-
-# Ensure Multiboot2 header is linked first
-target_link_libraries(moimoios.bin PRIVATE
-    -Wl,--section-start=.multiboot=0x100000
+    # GNU linker options
+    $<$<NOT:$<C_COMPILER_ID:MSVC>>: -T ${CMAKE_SOURCE_DIR}/kernel/boot/linker.ld -nostdlib -Wl,--section-start=.multiboot=0x100000>
+    # MSVC linker options (placeholder, may need adjustment for bare-metal)
+    $<$<C_COMPILER_ID:MSVC>: /NODEFAULTLIB /ENTRY:kernel_entry>
 )
 
 # Set output directory for the executable
