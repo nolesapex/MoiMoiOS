@@ -1,31 +1,32 @@
+# --------------------------------------------------------
 # MoiMoiOS Kernel CMakeLists.txt
+# --------------------------------------------------------
 cmake_minimum_required(VERSION 3.13)
 project(MoiMoiOS C ASM)
 
-# Set the target architecture and compiler flags
+# Target architecture
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-# Toolchain file will set CMAKE_C_COMPILER, CMAKE_ASM_COMPILER, etc.
+# Enable ASM (for GNU .asm files)
+enable_language(ASM)
 
-# Add kernel source directories
-aux_source_directory(kernel/core CORE_SOURCES)
-list(APPEND CORE_SOURCES kernel/core/klog.c kernel/core/panic.c)
-aux_source_directory(kernel/services/chest CHEST_SOURCES)
-aux_source_directory(kernel/services/io IO_SOURCES)
-aux_source_directory(kernel/services/notification NOTIFICATION_SOURCES)
-aux_source_directory(kernel/boot BOOT_ASM_SOURCES)
+# -----------------------------
+# Collect source files
+# -----------------------------
+file(GLOB_RECURSE CORE_SOURCES kernel/core/*.c)
+file(GLOB_RECURSE SERVICE_SOURCES kernel/services/*/*.c)
+file(GLOB BOOT_SOURCES kernel/boot/*.asm)
 
-# Combine all source files
 set(KERNEL_SOURCES
     ${CORE_SOURCES}
-    ${CHEST_SOURCES}
-    ${IO_SOURCES}
-    ${NOTIFICATION_SOURCES}
-    ${BOOT_ASM_SOURCES}
+    ${SERVICE_SOURCES}
+    ${BOOT_SOURCES}
 )
 
-# Add include directories
+# -----------------------------
+# Include directories
+# -----------------------------
 include_directories(
     kernel/core
     kernel/services/chest
@@ -33,40 +34,46 @@ include_directories(
     kernel/services/notification
 )
 
-# Create the kernel executable FIRST
-add_executable(moimoios.bin ${KERNEL_SOURCES})
+# -----------------------------
+# Define the kernel target
+# -----------------------------
+add_executable(moimoios.elf ${KERNEL_SOURCES})
 
-# Set common compiler flags
-target_compile_options(moimoios.bin PRIVATE
-    $<$<COMPILE_LANG_AND_ID:C,GNU>: -Wall -Wextra -std=c11 -ffreestanding -O2 -g>
-    $<$<COMPILE_LANG_AND_ID:ASM,GNU>: -f elf64>
-    # MSVC specific flags (placeholder, may need adjustment for bare-metal)
-    $<$<COMPILE_LANG_AND_ID:C,MSVC>: /W4 /WX /std:c11 /O2 /Zi>
-    $<$<COMPILE_LANG_AND_ID:ASM,MSVC>: > # MSVC assembly flags might need specific handling or separate assembler
+# Compiler flags for bare metal
+target_compile_options(moimoios.elf PRIVATE
+    $<$<COMPILE_LANG_AND_ID:C,GNU>:
+        -Wall -Wextra -std=c11 -ffreestanding -O2 -g
+    >
+    $<$<COMPILE_LANG_AND_ID:ASM,GNU>:
+        -x assembler-with-cpp
+    >
 )
 
-# Linker script and options
-target_link_options(moimoios.bin PRIVATE
-    # GNU linker options
-    $<$<NOT:$<C_COMPILER_ID:MSVC>>: -T ${CMAKE_SOURCE_DIR}/kernel/boot/linker.ld -nostdlib -Wl,--section-start=.multiboot=0x100000>
-    # MSVC linker options (placeholder, may need adjustment for bare-metal)
-    $<$<C_COMPILER_ID:MSVC>: /NODEFAULTLIB /ENTRY:kernel_entry>
+# Linker options
+target_link_options(moimoios.elf PRIVATE
+    $<$<C_COMPILER_ID:GNU>:
+        -T ${CMAKE_SOURCE_DIR}/kernel/boot/linker.ld
+        -nostdlib
+        -static
+    >
 )
 
-# Set output directory for the executable
-set_target_properties(moimoios.bin PROPERTIES
+# Set output directories
+set_target_properties(moimoios.elf PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/boot
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/boot
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/boot
 )
 
-# Custom command to create the ISO image
+# -----------------------------
+# ISO creation (GRUB bootable)
+# -----------------------------
 add_custom_target(iso ALL
-    COMMAND mkdir -p ${CMAKE_BINARY_DIR}/iso/boot/grub
-    COMMAND cp $<TARGET_FILE:moimoios.bin> ${CMAKE_BINARY_DIR}/iso/boot/moimoios.bin
-    COMMAND cp ${CMAKE_SOURCE_DIR}/kernel/boot/grub.cfg ${CMAKE_BINARY_DIR}/iso/boot/grub/
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/iso/boot/grub
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:moimoios.elf> ${CMAKE_BINARY_DIR}/iso/boot/moimoios.elf
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/kernel/boot/grub.cfg ${CMAKE_BINARY_DIR}/iso/boot/grub/
     COMMAND grub-mkrescue -o ${CMAKE_BINARY_DIR}/moimoios.iso ${CMAKE_BINARY_DIR}/iso
-    DEPENDS moimoios.bin
+    DEPENDS moimoios.elf
     COMMENT "Creating bootable ISO image"
 )
 
