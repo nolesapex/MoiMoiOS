@@ -7,6 +7,7 @@
 #include "devices.h"
 #include "log.h"
 #include "panic.h"
+#include "../services/io/io_syscalls.h" // New include
 
 void kernel_main() {
     klog("\n=== MoiMoiOS Kernel Boot ===\n");
@@ -15,6 +16,9 @@ void kernel_main() {
     if (!init_trap_dispatch()) {
         panic("[FATAL] Failed to initialize trap dispatch.");
     }
+
+    klog("[0.1] Initializing I/O System Calls...\n"); // New step
+    init_io_syscalls(); // Call new initialization function
 
     klog("[1] Starting Scheduler Subsystem...\n");
     if (!init_scheduler()) {

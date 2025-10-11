@@ -42,7 +42,6 @@ extern void* isr_stub_table[];  // ISR handlers defined in assembly
 // ----------------------------------------------------------
 // Syscall Infrastructure
 // ----------------------------------------------------------
-typedef int (*syscall_handler_t)(uint64_t, uint64_t, uint64_t, uint64_t);
 static syscall_handler_t syscall_table[MAX_SYSCALLS];
 
 // Register a syscall handler
@@ -135,3 +134,4 @@ void init_trap_dispatch() {
 
     kprintf("[TRAP] IDT initialized and syscall table ready.\n");
 }
+
