@@ -32,6 +32,9 @@ include_directories(
     kernel/services/notification
 )
 
+# Create the kernel executable FIRST
+add_executable(moimoios.bin ${KERNEL_SOURCES})
+
 # Set common compiler flags
 target_compile_options(moimoios.bin PRIVATE
     $<$<COMPILE_LANG_AND_ID:C,GNU>: -Wall -Wextra -std=c11 -ffreestanding -O2 -g>
@@ -40,9 +43,6 @@ target_compile_options(moimoios.bin PRIVATE
     $<$<COMPILE_LANG_AND_ID:C,MSVC>: /W4 /WX /std:c11 /O2 /Zi>
     $<$<COMPILE_LANG_AND_ID:ASM,MSVC>: > # MSVC assembly flags might need specific handling or separate assembler
 )
-
-# Create the kernel executable
-add_executable(moimoios.bin ${KERNEL_SOURCES})
 
 # Linker script and options
 target_link_options(moimoios.bin PRIVATE
@@ -62,7 +62,7 @@ set_target_properties(moimoios.bin PROPERTIES
 # Custom command to create the ISO image
 add_custom_target(iso ALL
     COMMAND mkdir -p ${CMAKE_BINARY_DIR}/iso/boot/grub
-    COMMAND cp $< ${CMAKE_BINARY_DIR}/iso/boot/moimoios.bin
+    COMMAND cp $<TARGET_FILE:moimoios.bin> ${CMAKE_BINARY_DIR}/iso/boot/moimoios.bin
     COMMAND cp ${CMAKE_SOURCE_DIR}/kernel/boot/grub.cfg ${CMAKE_BINARY_DIR}/iso/boot/grub/
     COMMAND grub-mkrescue -o ${CMAKE_BINARY_DIR}/moimoios.iso ${CMAKE_BINARY_DIR}/iso
     DEPENDS moimoios.bin
