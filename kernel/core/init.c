@@ -1,7 +1,7 @@
 // MoiMoiOS Kernel Initialization
 
 #include "types.h"
-#include "traps.h"
+#include "trap.h"
 #include "scheduler.h"
 #include "memory.h"
 #include "devices.h"
