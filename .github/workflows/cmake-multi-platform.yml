@@ -43,12 +43,42 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    # 🧱 Install dependencies and cross-compiler (Linux only)
     - name: Install cross-compiler (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-x86-64-linux-gnu grub-pc-bin grub-common xorriso
+        sudo apt-get install -y grub-pc-bin xorriso make cmake build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo wget
 
+        # Check if already cached
+        if ! command -v x86_64-elf-gcc &> /dev/null; then
+          echo "Building x86_64-elf cross-compiler..."
+          mkdir -p $HOME/cross && cd $HOME/cross
+
+          # Build binutils
+          wget https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.gz
+          tar -xzf binutils-2.41.tar.gz
+          mkdir binutils-build && cd binutils-build
+          ../binutils-2.41/configure --target=x86_64-elf --prefix=/usr/local --with-sysroot --disable-nls --disable-werror
+          make -j$(nproc)
+          sudo make install
+          cd ..
+
+          # Build gcc (minimal)
+          wget https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz
+          tar -xzf gcc-13.2.0.tar.gz
+          mkdir gcc-build && cd gcc-build
+          ../gcc-13.2.0/configure --target=x86_64-elf --prefix=/usr/local --disable-nls --enable-languages=c,c++ --without-headers
+          make all-gcc -j$(nproc)
+          make all-target-libgcc -j$(nproc)
+          sudo make install-gcc
+          sudo make install-target-libgcc
+        fi
+
+        which x86_64-elf-gcc
+        x86_64-elf-gcc --version
+
+    # ⚙️ Configure CMake
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -58,17 +88,19 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
+    # 🧩 Build Kernel
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+    # 💿 Create bootable ISO (Linux only)
     - name: Create ISO (Linux only)
       if: runner.os == 'Linux'
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: cmake --build . --target iso
 
+    # 📦 Upload build artifact
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: build-artifact-${{ matrix.os }}-${{ matrix.c_compiler }}
         path: ${{ steps.strings.outputs.build-output-dir }}
-
