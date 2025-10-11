@@ -11,14 +11,6 @@
   <b>Built from Scratch · Secure · Lightweight · Auditable</b>
 </p>
 
----
-
-<p align="center">
-<b>Modular Capability-Based Operating System</b><br>
-<i>Built from Scratch.</i>
-</
-    p>
-
 ## What is MoiMoiOS?
 
 **MoiMoiOS** is a modular, secure, lightweight operating system designed from the ground up.  
