@@ -17,7 +17,7 @@
 const char* kernel_error_to_string(kernel_error_t err) {
     switch (err) {
         case ERR_NONE: return "No error";
-        case ERR_MEM_MAP: return "Out of map menory issue";
+        case ERR_MEM_MAP: return "Out of map memory issue";
         case ERR_ACCESS_DENIED: return "Access denied";
         case ERR_INVALID_TOKEN: return "Invalid token";
         case ERR_INVALID_ARGUMENT: return "Invalid argument";
