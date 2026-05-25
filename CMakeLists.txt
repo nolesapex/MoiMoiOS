@@ -1,6 +1,4 @@
-# --------------------------------------------------------
 # MoiMoiOS Kernel CMakeLists.txt
-# --------------------------------------------------------
 cmake_minimum_required(VERSION 3.13)
 project(MoiMoiOS C ASM)
 
@@ -11,9 +9,7 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 # Enable ASM (for GNU .asm files)
 enable_language(ASM)
 
-# -----------------------------
 # Collect source files
-# -----------------------------
 file(GLOB_RECURSE CORE_SOURCES kernel/core/*.c)
 file(GLOB_RECURSE SERVICE_SOURCES kernel/services/*/*.c)
 file(GLOB BOOT_SOURCES kernel/boot/*.asm)
@@ -23,20 +19,14 @@ set(KERNEL_SOURCES
     ${SERVICE_SOURCES}
     ${BOOT_SOURCES}
 )
-
-# -----------------------------
 # Include directories
-# -----------------------------
 include_directories(
     kernel/core
     kernel/services/chest
     kernel/services/io
     kernel/services/notification
 )
-
-# -----------------------------
 # Define the kernel target
-# -----------------------------
 add_executable(moimoios.elf ${KERNEL_SOURCES})
 
 # Compiler flags for bare metal
@@ -64,10 +54,7 @@ set_target_properties(moimoios.elf PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/boot
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/boot
 )
-
-# -----------------------------
 # ISO creation (GRUB bootable)
-# -----------------------------
 add_custom_target(iso ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/iso/boot/grub
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:moimoios.elf> ${CMAKE_BINARY_DIR}/iso/boot/moimoios.elf
