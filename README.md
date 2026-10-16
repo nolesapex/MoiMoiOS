@@ -6,8 +6,9 @@
 </h1>
 
 <p align="center">
-  <i>Modular Capability-Based Operating System</i><br>
+  <i>Modular Capability-Based Operating System based off the Anadakin Framework</i><br>
   <b>Built from Scratch · Secure · Lightweight · Auditable</b>
+  <b>Brought to you by MoiMoi</b>
 </p>
 
 ## What is MoiMoiOS?
